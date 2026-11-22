@@ -1,6 +1,6 @@
 # brightnessctl for Void Linux (x86_64-musl / Intel Skylake)
 
-A hardware-specific Void Linux XBPS package for [brightnessctl](https://github.com/Hummer12007/brightnessctl), targeting **x86_64-musl** and Intel Skylake CPUs. The reference processor is the Intel Core i3-6100U.
+A hardware-specific Void Linux XBPS package for [brightnessctl](https://github.com/Hummer12007/brightnessctl), targeting **x86_64-musl** and Intel Skylake CPUs. The reference machine is the HP Pavilion x360 T0Y58PA with an Intel Core i3-6100U.
 
 This repository packages upstream brightnessctl; it does not fork or patch the application source.
 
@@ -8,8 +8,9 @@ This repository packages upstream brightnessctl; it does not fork or patch the a
 
 - Distribution: Void Linux
 - XBPS target: `x86_64-musl` only
-- CPU target: Intel Skylake (`-march=skylake -mtune=skylake`)
+- CPU target: Intel Skylake (`-O2 -march=skylake -mtune=skylake -fno-plt`)
 - Reference CPU: Intel Core i3-6100U (2 cores / 4 threads)
+- Graphics: Intel HD Graphics 520 using the i915 driver
 - C library: musl
 - Build system: upstream GNU Makefile
 
@@ -25,17 +26,23 @@ The package recipe follows Void Linux's [brightnessctl template](https://github.
 - Source archive: `https://github.com/Hummer12007/brightnessctl/archive/0.5.1.tar.gz`
 - SHA-256: `a68869e23f56ac4f2e28f1783002810ddbf10f95e1af9b48b2912fb169f46994`
 - Build style: `gnu-makefile`
-- Compiler tuning: `-march=skylake -mtune=skylake`
+- Compiler tuning: `-O2 -march=skylake -mtune=skylake -fno-plt`
 - Udev rules: installed in `/usr/lib/udev/rules.d`
 
-The project is a small C utility that reads and writes kernel-exposed brightness controls. Skylake tuning does not add hardware support or change device discovery, and no runtime speedup is claimed without measurements on the reference CPU.
+The project is a small C utility that reads and writes kernel-exposed brightness controls. The flags have deliberately modest goals:
+
+- `-O2` enables the normal GCC release optimizations without the code-size and compile-time trade-offs of `-O3`.
+- `-march=skylake -mtune=skylake` lets GCC use and schedule instructions for the i3-6100U's Skylake microarchitecture.
+- `-fno-plt` avoids Procedure Linkage Table call stubs for external functions in this dynamically linked executable.
+
+LTO and PGO are intentionally not enabled. Upstream builds the utility from a single C translation unit, so LTO has little cross-file optimization to perform. PGO would add training/build complexity to a short-lived program whose work is dominated by sysfs and kernel operations. These choices avoid claiming speedups that have not been measured on the laptop.
 
 ## Install a release
 
-Successful builds from `main` publish a versioned GitHub Release. The initial package tag is `0.5.1_1`, and its asset is:
+Successful builds from `main` publish a versioned GitHub Release. The package tag for this optimized build is `0.5.1_2`, and its asset is:
 
 ```
-brightnessctl-0.5.1_1.x86_64-musl.xbps
+brightnessctl-0.5.1_2.x86_64-musl.xbps
 ```
 
 Download the package from [GitHub Releases](https://github.com/rmicro/brightnessctl/releases), then install it on a compatible Void Linux system:
@@ -63,6 +70,14 @@ Inspect available controls with:
 ```sh
 ls /sys/class/backlight
 brightnessctl --list
+```
+
+The i915 driver commonly exposes an Intel backlight device through `/sys/class/backlight`, often named `intel_backlight`. The exact name is selected by the running kernel/firmware, so discover it instead of hard-coding it. Once listed, you can target that device explicitly:
+
+```sh
+brightnessctl --class=backlight info
+# Or, when the listed device is named intel_backlight:
+brightnessctl --device=intel_backlight info
 ```
 
 ## Build locally
