@@ -41,7 +41,7 @@ notes="Automated Void Linux XBPS package release for brightnessctl $VERSION (rev
 
 Target:
 - Void Linux x86_64-musl
-- Intel Skylake instruction set (-march=skylake -mtune=skylake)
+- Intel Skylake build flags (-O2 -march=skylake -mtune=skylake -fno-plt)
 - Reference processor: Intel Core i3-6100U
 
 Packaging:
