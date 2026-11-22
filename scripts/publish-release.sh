@@ -1,13 +1,13 @@
 #!/bin/sh
 set -eu
 
-dist=\${1:-dist}
-: "\${GH_TOKEN:?GH_TOKEN is required}"
-: "\${GH_REPO:?GH_REPO is required}"
-: "\${VERSION:?VERSION is required}"
-: "\${REVISION:?REVISION is required}"
-: "\${TAG:?TAG is required}"
-: "\${RELEASE_COMMIT:?RELEASE_COMMIT is required}"
+dist=${1:-dist}
+: "${GH_TOKEN:?GH_TOKEN is required}"
+: "${GH_REPO:?GH_REPO is required}"
+: "${VERSION:?VERSION is required}"
+: "${REVISION:?REVISION is required}"
+: "${TAG:?TAG is required}"
+: "${RELEASE_COMMIT:?RELEASE_COMMIT is required}"
 
 printf '%s\n' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
     echo "Invalid package version: $VERSION" >&2
@@ -24,13 +24,13 @@ esac
     exit 1
 }
 
-expected_tag="\${VERSION}_\${REVISION}"
+expected_tag="${VERSION}_${REVISION}"
 [ "$TAG" = "$expected_tag" ] || {
     echo "Unexpected tag: $TAG (expected $expected_tag)" >&2
     exit 1
 }
 
-package_name="brightnessctl-\${VERSION}_\${REVISION}.x86_64-musl.xbps"
+package_name="brightnessctl-${VERSION}_${REVISION}.x86_64-musl.xbps"
 package_path="$dist/$package_name"
 [ -s "$package_path" ] || {
     echo "Expected package was not found: $package_path" >&2
@@ -83,4 +83,4 @@ printf '%s\n' "$published_assets" | grep -Fxq "$package_name" || {
     echo "- Release: [$TAG]($release_url)"
     echo "- Package: $package_name"
     echo "- Target: x86_64-musl / Intel Skylake"
-} >> "\${GITHUB_STEP_SUMMARY:-/dev/null}"
+} >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
