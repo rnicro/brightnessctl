@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: brightnessctl-x86_64-musl-\${{ github.ref }}
+  group: brightnessctl-x86_64-musl-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -26,9 +26,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
-      version: \${{ steps.meta.outputs.version }}
-      revision: \${{ steps.meta.outputs.revision }}
-      tag: \${{ steps.meta.outputs.tag }}
+      version: ${{ steps.meta.outputs.version }}
+      revision: ${{ steps.meta.outputs.revision }}
+      tag: ${{ steps.meta.outputs.tag }}
     steps:
       - name: Checkout package repository
         uses: actions/checkout@v6
@@ -54,7 +54,7 @@ jobs:
           sh scripts/test-template.sh
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "revision=$revision" >> "$GITHUB_OUTPUT"
-          echo "tag=\${version}_\${revision}" >> "$GITHUB_OUTPUT"
+          echo "tag=${version}_${revision}" >> "$GITHUB_OUTPUT"
           {
             echo "### Build target"
             echo
@@ -105,16 +105,16 @@ jobs:
           set -euo pipefail
           ./xbps-src -A "$XBPS_TARGET_ARCH" pkg brightnessctl
           mkdir -p "$GITHUB_WORKSPACE/dist"
-          package_name="brightnessctl-\${{ steps.meta.outputs.version }}_\${{ steps.meta.outputs.revision }}.x86_64-musl.xbps"
+          package_name="brightnessctl-${{ steps.meta.outputs.version }}_${{ steps.meta.outputs.revision }}.x86_64-musl.xbps"
           mapfile -t packages < <(
             find hostdir/binpkgs -type f -name "$package_name" -print
           )
-          if [ "\${#packages[@]}" -ne 1 ]; then
-            printf 'Expected exactly one brightnessctl package, found %s\n' "\${#packages[@]}" >&2
+          if [ "${#packages[@]}" -ne 1 ]; then
+            printf 'Expected exactly one brightnessctl package, found %s\n' "${#packages[@]}" >&2
             find hostdir/binpkgs -type f -name '*brightnessctl*.xbps' -print >&2
             exit 1
           fi
-          cp "\${packages[0]}" "$GITHUB_WORKSPACE/dist/"
+          cp "${packages[0]}" "$GITHUB_WORKSPACE/dist/"
           package_path="$GITHUB_WORKSPACE/dist/$package_name"
           printf -- '- **Package size:** %s bytes (%s)\n' \
             "$(stat -c '%s' "$package_path")" "$(du -h "$package_path" | cut -f1)" \
@@ -151,10 +151,10 @@ jobs:
 
       - name: Publish or verify immutable release
         env:
-          GH_TOKEN: \${{ github.token }}
-          GH_REPO: \${{ github.repository }}
-          VERSION: \${{ needs.build.outputs.version }}
-          REVISION: \${{ needs.build.outputs.revision }}
-          TAG: \${{ needs.build.outputs.tag }}
-          RELEASE_COMMIT: \${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.build.outputs.version }}
+          REVISION: ${{ needs.build.outputs.revision }}
+          TAG: ${{ needs.build.outputs.tag }}
+          RELEASE_COMMIT: ${{ github.sha }}
         run: sh scripts/publish-release.sh dist
