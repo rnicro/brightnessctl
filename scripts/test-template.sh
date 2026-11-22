@@ -16,7 +16,7 @@ grep -Fq 'make_install_args="UDEVDIR=/usr/lib/udev/rules.d"' "$template"
 grep -Fq 'hostmakedepends="pkg-config"' "$template"
 grep -Fq 'archs="x86_64-musl"' "$template"
 grep -Fq 'CFLAGS+=" -march=skylake -mtune=skylake"' "$template"
-grep -Fq 'https://github.com/Hummer12007/brightnessctl/archive/\${version}.tar.gz' "$template"
+grep -Fq 'https://github.com/Hummer12007/brightnessctl/archive/${version}.tar.gz' "$template"
 grep -Fq 'license="MIT"' "$template"
 grep -Fq 'vlicense LICENSE' "$template"
 
