@@ -48,7 +48,7 @@ brightnessctl-0.5.1_2.x86_64-musl.xbps
 Download the package from [GitHub Releases](https://github.com/rmicro/brightnessctl/releases), then install it on a compatible Void Linux system:
 
 ```sh
-sudo xbps-install ./brightnessctl-0.5.1_1.x86_64-musl.xbps
+sudo xbps-install ./brightnessctl-0.5.1_2.x86_64-musl.xbps
 ```
 
 These are standalone package releases, not a signed, indexed XBPS repository.
