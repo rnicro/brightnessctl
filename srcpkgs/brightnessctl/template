@@ -1,7 +1,7 @@
 # Template file for 'brightnessctl'
 pkgname=brightnessctl
 version=0.5.1
-revision=1
+revision=2
 build_style=gnu-makefile
 make_use_env=yes
 make_install_args="UDEVDIR=/usr/lib/udev/rules.d"
@@ -18,7 +18,9 @@ archs="x86_64-musl"
 lib32disabled=yes
 
 # Build for Intel Skylake, including the Core i3-6100U, not the CI host CPU.
-CFLAGS+=" -march=skylake -mtune=skylake"
+# Keep the optimization level explicit and target the i3-6100U instruction set.
+# -fno-plt avoids PLT stubs for external calls in this small dynamically linked utility.
+CFLAGS+=" -O2 -march=skylake -mtune=skylake -fno-plt"
 
 post_install() {
 	vlicense LICENSE
